@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English Placement Test</title>
+<meta name="description" content="Online English placement test: grammar, reading and writing.">
+<meta name="theme-color" content="#1F3A93">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF1F7;     /* desk */
+    --sheet:#FFFFFF;     /* exam paper */
+    --ink:#1F3A93;       /* blue pen ink */
+    --ink-soft:#E4EAF8;  /* ink wash for a chosen answer */
+    --graphite:#22262E;  /* body text */
+    --muted:#5A6371;     /* secondary text */
+    --rule:#D2D9E4;      /* lines on the paper */
+    --redpen:#B8322A;    /* teacher's red pen: time warnings, errors */
+    --marker:#F2B705;    /* highlighter: keyboard focus */
+    --serif:"Literata", Georgia, "Times New Roman", serif;
+    --sans:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--graphite);font:17px/1.55 var(--sans)}
+  [hidden]{display:none !important}
+  :focus-visible{outline:3px solid var(--marker);outline-offset:2px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* Top bar */
+  #bar{position:sticky;top:0;z-index:10;background:var(--sheet);border-bottom:1px solid var(--rule)}
+  .bar-in{max-width:780px;margin:0 auto;padding:10px 16px 8px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .bar-title{font-size:14px;color:var(--muted);line-height:1.3}
+  .bar-title b{display:block;color:var(--graphite);font-size:16px}
+  .timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:19px;color:var(--ink);padding:3px 10px;border:2px solid currentColor;border-radius:8px;white-space:nowrap}
+  .timer.warn{color:var(--redpen)}
+  .segs{max-width:780px;margin:0 auto;padding:0 16px 10px;display:flex;gap:4px}
+  .segs i{flex:1;height:4px;border-radius:2px;background:var(--rule)}
+  .segs i.done{background:var(--ink)}
+  .segs i.now{background:#93A5D8}
+
+  /* Page */
+  main{max-width:780px;margin:0 auto;padding:20px 16px 120px}
+  main.wide{max-width:1120px}
+  .sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:22px 20px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,7vw,42px);line-height:1.12;margin:0 0 14px;color:var(--ink);letter-spacing:-.01em}
+  h2{font-size:20px;line-height:1.3;margin:0 0 4px}
+  p{margin:0 0 12px}
+  .muted{color:var(--muted)}
+  .inst{color:var(--muted);margin:0 0 14px}
+
+  /* Intro */
+  .by{color:var(--muted);margin:0 0 6px}
+  .lede{font-size:19px;max-width:34em}
+  .parts{list-style:none;margin:20px 0 6px;padding:0;counter-reset:p}
+  .parts li{counter-increment:p;display:flex;gap:14px;align-items:baseline;padding:10px 0;border-top:1px solid var(--rule)}
+  .parts li:last-child{border-bottom:1px solid var(--rule)}
+  .parts li::before{content:counter(p, upper-alpha);font-weight:700;color:var(--ink);width:1.4em}
+  .parts b{display:block}
+  .fields{display:grid;gap:14px;margin:22px 0 8px}
+  label.f{display:grid;gap:5px;font-weight:700;font-size:15px}
+  input[type=text],textarea{width:100%;font:inherit;font-size:17px;color:inherit;background:#fff;border:1.5px solid #B9C3D2;border-radius:8px;padding:11px 12px}
+  input[type=text]:focus,textarea:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px var(--ink-soft)}
+  .rules{margin:8px 0 22px;padding-left:20px}
+  .rules li{margin:6px 0}
+  .err{color:var(--redpen);font-weight:700;margin:10px 0 0}
+
+  /* Questions */
+  .qs{list-style:none;margin:0;padding:0}
+  .q{padding:18px 0;border-top:1px solid var(--rule)}
+  .q:first-child{border-top:0;padding-top:6px}
+  .qtext{font-family:var(--serif);font-size:18px;line-height:1.5;margin:0 0 12px;display:flex;gap:10px}
+  .qn{font-family:var(--sans);font-weight:700;color:var(--ink);min-width:2.4em;flex:none}
+  .gap{display:inline-block;width:3.4em;border-bottom:2px solid var(--graphite);vertical-align:.15em}
+  .opts{display:grid;gap:8px;padding-left:calc(2.4em + 10px)}
+  .opts.two{grid-template-columns:1fr 1fr}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:8px 12px 8px 9px;background:var(--sheet);border:1.5px solid var(--rule);border-radius:10px;font:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .opt:hover{border-color:#8EA0D4}
+  .bub{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid #8B94A4;display:grid;place-items:center;font-weight:700;font-size:14px;color:var(--muted)}
+  .opt[aria-pressed="true"]{border-color:var(--ink);background:var(--ink-soft)}
+  .opt[aria-pressed="true"] .bub{background:var(--ink);border-color:var(--ink);color:#fff}
+  @media (prefers-reduced-motion:no-preference){
+    .bub,.opt{transition:background-color .12s ease,border-color .12s ease,color .12s ease}
+  }
+
+  /* Reading */
+  .passage{background:#F6F8FC;border:1px solid var(--rule);border-radius:10px;padding:18px 18px 8px;font-family:var(--serif);font-size:18px;line-height:1.72;margin-bottom:22px}
+  .passage h2{font-family:var(--sans);font-size:15px;color:var(--muted);font-weight:700;margin:0 0 8px}
+  @media (min-width:920px){
+    .reading{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+    .passage{position:sticky;top:96px;max-height:calc(100vh - 116px);overflow:auto;margin:0}
+  }
+
+  /* Writing */
+  .prompt{font-family:var(--serif);font-size:18px;line-height:1.6;border-left:3px solid var(--ink);padding:2px 0 2px 14px;margin:6px 0 18px}
+  textarea{min-height:260px;line-height:1.6;resize:vertical}
+  .wmeta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:15px}
+  .wmeta .err{margin:0}
+
+  /* Review */
+  .rv{list-style:none;margin:16px 0 0;padding:0}
+  .rv li{border-top:1px solid var(--rule)}
+  .rv button{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;padding:14px 4px;cursor:pointer}
+  .rv button:hover .rv-name{color:var(--ink);text-decoration:underline}
+  .rv-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .rv-name{font-weight:700}
+  .rv-count{color:var(--muted);font-size:15px;white-space:nowrap}
+  .bubs{display:flex;flex-wrap:wrap;gap:6px}
+  .rb{width:30px;height:30px;border-radius:50%;border:2px solid #A3ACBA;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted)}
+  .rb.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .confirm{margin-top:22px;padding:16px;border:2px solid var(--ink);border-radius:10px;background:var(--ink-soft)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+  /* Done */
+  .tick{width:56px;height:56px;border-radius:50%;background:var(--ink);display:grid;place-items:center;margin-bottom:16px}
+  .status{font-size:18px}
+  .status.bad{color:var(--redpen);font-weight:700}
+
+  /* Buttons */
+  .btn{min-height:50px;padding:0 20px;border-radius:10px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+  .btn.primary{background:var(--ink);color:#fff}
+  a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn.wide{width:100%}
+  #nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--sheet);border-top:1px solid var(--rule);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .nav-in{max-width:780px;margin:0 auto;display:flex;gap:10px}
+  .nav-in .primary{flex:1}
+
+  /* Teacher watching: photo + speech bubble on test pages, pop-up when the learner comes back */
+  .watch{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+  .avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;border:3px solid var(--ink);flex:none;background:var(--ink-soft);display:grid;place-items:center;font-weight:700;font-size:19px;color:var(--ink)}
+  .bubble{position:relative;margin:0;background:#FFF1C2;color:#5C4300;font-weight:700;font-size:17px;padding:9px 15px;border-radius:14px}
+  .bubble::before{content:"";position:absolute;left:-8px;top:50%;margin-top:-7px;border-style:solid;border-width:7px 8px 7px 0;border-color:transparent #FFF1C2 transparent transparent}
+  .peek{position:fixed;inset:0;z-index:50;background:rgba(18,26,46,.6);display:grid;place-items:center;padding:20px}
+  .peek-card{background:var(--sheet);border-radius:16px;padding:26px 22px 22px;max-width:340px;width:100%;text-align:center}
+  .peek-card .avatar{width:104px;height:104px;font-size:34px;margin:0 auto 14px;border-width:4px}
+  .peek-card h2{font-family:var(--serif);font-size:26px;color:var(--ink);margin:0 0 6px}
+  .peek-card p{color:var(--muted);margin:0 0 18px}
+  @media (prefers-reduced-motion:no-preference){
+    .peek-card{animation:peek .25s ease-out}
+    @keyframes peek{from{transform:translateY(16px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+  }
+
+  /* Response page (teacher view), laid out like a Google Forms response */
+  body.rmode main{max-width:820px;padding-bottom:48px}
+  .card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;margin-bottom:12px}
+  .card.head{border-top:10px solid var(--ink)}
+  .r-title{font-family:var(--serif);font-weight:600;font-size:32px;line-height:1.15;color:var(--graphite);margin:2px 0 14px}
+  .small{font-size:14px}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px 20px;font-size:15px;overflow-wrap:anywhere}
+  .rq-q.wprompt{font-family:var(--sans);font-size:15px;color:var(--muted)}
+  .meta span{display:block;color:var(--muted);font-size:13px}
+  .flag{color:var(--redpen)}
+  .score-big{display:flex;align-items:baseline;gap:8px}
+  .score-big b{font-family:var(--serif);font-size:48px;line-height:1;color:var(--ink)}
+  .score-big span{font-size:22px;color:var(--muted)}
+  .brk{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
+  .brk td{padding:9px 0;border-top:1px solid var(--rule);vertical-align:top}
+  .brk td:last-child{text-align:right;font-weight:700;white-space:nowrap;padding-left:14px}
+  .brk tr.tot td{border-top:2px solid var(--graphite);font-weight:700}
+  .rub td:first-child{width:2em;text-align:left;padding-left:0}
+  .rub td:last-child{text-align:left;font-weight:400;white-space:normal}
+  .meter{height:6px;background:var(--rule);border-radius:3px;margin-top:6px;overflow:hidden}
+  .meter i{display:block;height:100%;background:var(--ink)}
+  .level{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--ink-soft)}
+  .level span{display:block;font-size:13px;color:var(--muted)}
+  .level b{display:block;font-size:22px;color:var(--ink)}
+  .level .cefr{font-size:15px;color:var(--graphite);font-weight:700}
+  .level p{margin:6px 0 0}
+  .filter{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 4px}
+  .chip{border:1.5px solid #B9C3D2;background:var(--sheet);color:var(--graphite);border-radius:999px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;background:var(--ink);color:#fff;border-radius:10px;padding:12px 18px;margin:26px 0 12px}
+  .sec-h h2{font-size:17px;margin:0}
+  .sec-h > span{font-weight:700;white-space:nowrap}
+  .rq{border-left:6px solid #A3ACBA}
+  .rq.ok{border-left-color:#1E8E3E}
+  .rq.bad{border-left-color:var(--redpen)}
+  .rq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+  .rq-q{display:flex;gap:10px;font-family:var(--serif);font-size:17px;line-height:1.5;margin:0 0 10px}
+  .pts{font-size:13px;color:var(--muted);white-space:nowrap;padding-top:3px}
+  .ro{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:6px;margin:2px 0}
+  .rad{width:18px;height:18px;border-radius:50%;border:2px solid #9AA3B2;flex:none}
+  .ro.pick .rad{border-color:currentColor;background:currentColor;box-shadow:inset 0 0 0 3px var(--sheet)}
+  .ro.pick.ok{background:#E6F4EA;color:#137333;font-weight:700}
+  .ro.pick.bad{background:#FCE8E6;color:#B3261E;font-weight:700}
+  .mk{margin-left:auto;font-size:18px}
+  .correct{margin-top:10px;padding:10px 12px;border-radius:6px;background:#F1F8F3}
+  .correct span{display:block;font-size:13px;color:var(--muted)}
+  .correct b{color:#137333}
+  .noans{color:var(--muted);font-style:italic;margin:0 0 6px}
+  summary{cursor:pointer;font-weight:700;color:var(--ink)}
+  .passage-r{font-family:var(--serif);font-size:17px;line-height:1.7;margin-top:12px}
+  .wbox{white-space:pre-wrap;background:#F6F8FC;border:1px solid var(--rule);border-radius:8px;padding:12px 14px;font-family:var(--serif);font-size:17px;line-height:1.65;margin-bottom:8px}
+  .mark{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;margin-top:10px}
+  .mark select{font:inherit;font-size:17px;padding:7px 10px;border:1.5px solid #B9C3D2;border-radius:8px;background:var(--sheet);color:inherit}
+  .sp{padding:12px 0;border-top:1px solid var(--rule)}
+  .sp:first-child{border-top:0;padding-top:0}
+  .sp p{margin:6px 0 0}
+  @media print{
+    .noprint{display:none !important}
+    body{background:#fff}
+    .card,.sec-h{break-inside:avoid}
+    .sec-h{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .ro.pick,.correct,.rq{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    details > *:not(summary){display:block}
+  }
+
+  @media (max-width:520px){
+    main{padding:14px 10px 116px}
+    .card{padding:16px 14px}
+    .r-title{font-size:27px}
+    .sheet{padding:18px 14px;border-radius:10px}
+    .opts{padding-left:0}
+    .qtext{font-size:17px}
+    .qn{min-width:1.9em}
+  }
+  @media (max-width:360px){ .opts.two{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header id="bar" hidden>
+  <div class="bar-in">
+    <div class="bar-title" id="barTitle"></div>
+    <div class="timer" id="timer" role="timer" aria-label="Time left">--:--</div>
+  </div>
+  <div class="segs" id="segs" aria-hidden="true"></div>
+</header>
+
+<main id="app"><noscript>This test needs JavaScript. Please open it in Chrome or Safari.</noscript></main>
+
+<nav id="nav" hidden aria-label="Test navigation">
+  <div class="nav-in">
+    <button class="btn" id="backBtn" type="button">Back</button>
+    <button class="btn primary" id="nextBtn" type="button">Next</button>
+  </div>
+</nav>
+
+<script>
+/* Teacher photo shown on the test pages ("" = show initials instead) */
+window.TEACHER_PHOTO = "data:image/jpeg;base64,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";
+</script>
+<script>
+/* ============================================================
+   SETTINGS: you only need to change the first three lines
+   ============================================================ */
+const CONFIG = {
+  teacherName: "Mohamed Gulie",                          // shown on the first page
+  formspreeEndpoint: "https://formspree.io/f/xgakablj", // paste your Formspree form link here
+  teacherWhatsApp: "252616809676",                                   // backup: your WhatsApp number with country code, digits only, e.g. "252612345678"
+  timeLimitMinutes: 120,                                 // time for Parts A, B and C together (120 = 2 hours)
+  showAnswersToLearner: true,                            // after submitting, the learner can see right and wrong answers
+  allowPaste: true,                                      // the learner may paste text into the writing boxes
+  watchMessage: "I see you 👀 Don't cheat!"     // shown next to your photo on every test page
+};
+
+/* ============================================================
+   TEST CONTENT  (answer = position of the right option: 0=A, 1=B, 2=C, 3=D)
+   ============================================================ */
+const PART_A = [
+  { first: 1, items: [
+    ["My name ___ Ahmed.", ["is","am","are","be"], 0],
+    ["___ you like tea?", ["Does","Are","Do","Is"], 2],
+    ["She ___ to school every day.", ["go","going","is go","goes"], 3],
+    ["There ___ three books on the table.", ["is","are","am","be"], 1],
+    ["I have two ___.", ["children","child","childs","childrens"], 0],
+    ["She is ___ engineer.", ["a","some","an","any"], 2],
+    ["Where ___ you yesterday?", ["are","did","was","were"], 3],
+    ["He ___ football last Sunday.", ["plays","played","play","playing"], 1],
+    ["I can't find ___ keys.", ["me","I","my","mine"], 2],
+    ["The shop opens ___ 8 o'clock.", ["at","in","on","to"], 0],
+    ["My brother is ___ than me.", ["tall","tallest","more tall","taller"], 3],
+    ["Look! It ___ outside.", ["rains","is raining","rain","raining"], 1],
+    ["I'm hungry. I want to ___ something.", ["drink","sleep","eat","wear"], 2],
+    ["We ___ to the market tomorrow.", ["are going","went","goes","have gone"], 0],
+    ["How ___ water do you drink every day?", ["many","lot","any","much"], 3]
+  ]},
+  { first: 16, items: [
+    ["I ___ in this city since 2015.", ["live","lived","am living","have lived"], 3],
+    ["If it rains tomorrow, we ___ at home.", ["will stay","stay","would stay","stayed"], 0],
+    ["When I arrived at the cinema, the film ___ already started.", ["has","is","had","did"], 2],
+    ["This bridge ___ in 1990.", ["built","was built","has built","is building"], 1],
+    ["He asked me ___ I could help him.", ["that","what","which","if"], 3],
+    ["I'm not used to ___ up so early.", ["getting","get","got","be getting"], 0],
+    ["You ___ wear a uniform at our school. It's the rule.", ["might","could","must","would"], 2],
+    ["The man ___ car was stolen called the police.", ["who","whose","which","whom"], 1],
+    ["I wish I ___ more time to study.", ["have","will have","having","had"], 3],
+    ["We need to ___ a decision before Friday.", ["make","do","have","give"], 0],
+    ["She's very good ___ solving problems.", ["in","on","at","for"], 2],
+    ["By the time you get home, I ___ dinner.", ["cook","will have cooked","am cooking","will cook"], 1],
+    ["He didn't study, ___ he failed the exam.", ["because","although","unless","so"], 3],
+    ["Could you ___ the music down? I'm trying to sleep.", ["put","make","turn","take"], 2],
+    ["___ the heavy rain, the match continued.", ["Although","Despite","Because","However"], 1]
+  ]},
+  { first: 31, items: [
+    ["___ I known about the problem, I would have helped.", ["If","Had","Should","Were"], 1],
+    ["Not only ___ late, but he also forgot the documents.", ["he arrived","arrived he","did he arrive","he did arrive"], 2],
+    ["Despite strong criticism, the minister refused to ___.", ["back up","give out","look up","back down"], 3],
+    ["It's high time we ___ this problem seriously.", ["took","take","will take","have taken"], 0],
+    ["He is said ___ a fortune in the 1990s.", ["to make","making","having made","to have made"], 3],
+    ["I'd rather you ___ smoke in here.", ["don't","didn't","won't","not"], 1],
+    ["The evidence was ___; nobody could argue with it.", ["ambiguous","negligible","irrefutable","tentative"], 2],
+    ["The meeting has been ___ until next week.", ["put off","put out","put up","put away"], 0],
+    ["The scientist's findings ___ doubt on the earlier theory.", ["made","put","took","cast"], 3],
+    ["Neither the manager nor the employees ___ aware of the change.", ["was","is","were","has been"], 2],
+    ["The more you practise, ___ you will become.", ["more confident","the more confident","the most confident","most confident"], 1],
+    ["After months of talks, the two sides finally “saw eye to eye”. This means they ___.", ["agreed","argued","met in person","gave up"], 0],
+    ["The decision was met with widespread ___.", ["dismal","dismiss","dismay","dismantle"], 2],
+    ["It's no use ___ about it now; what's done is done.", ["to complain","complain","complained","complaining"], 3],
+    ["His explanation was so ___ that even a child could follow it.", ["convoluted","lucid","obscure","verbose"], 1]
+  ]}
+];
+
+const TF = ["True","False"];
+const PART_B = [
+  { first: 1, tf: true,
+    instruction: "Read the text. Is each sentence true or false?",
+    passage: [
+      "My name is Amina. I am 24 years old and I live in a small house with my parents and my two sisters. I work in a bank in the city centre. Every morning I get up at six o'clock and have breakfast with my family. I usually eat bread and eggs and drink a cup of tea. Then I take the bus to work. The journey takes thirty minutes. I start work at eight and finish at four. In the evening I cook dinner or read a book. On Fridays I visit my grandmother."
+    ],
+    items: [
+      ["Amina lives alone.", TF, 1],
+      ["She works in a bank.", TF, 0],
+      ["She drives to work.", TF, 1],
+      ["Her journey to work takes half an hour.", TF, 0],
+      ["She visits her grandmother on Fridays.", TF, 0]
+    ]},
+  { first: 6,
+    instruction: "Read the text and choose the best answer.",
+    passage: [
+      "Two years ago, Leila lost her job at a clothing factory. Instead of looking for another factory job, she decided to turn her hobby into a business. She had always enjoyed making bags from colourful fabric, and her friends often asked where they could buy one.",
+      "At first, Leila sold her bags only to her neighbours. Then a cousin suggested she open an online shop and post photos on social media. Within six months she was receiving orders from other cities, and she had to hire two young women to help her.",
+      "Running a business has not been easy. Leila works long hours, and the price of fabric has risen sharply. However, she says the hardest part was learning to say no: “In the beginning I accepted every order, even when I knew I couldn't finish on time. Now I plan carefully.” Next year, she hopes to open a small shop in the market."
+    ],
+    items: [
+      ["Why did Leila start her business?", ["She wanted to leave the factory","She had lost her job","Her cousin asked her to","She needed a hobby"], 1],
+      ["Who first bought Leila's bags?", ["People in other cities","Her cousin","Her neighbours","Factory workers"], 2],
+      ["What happened after she started selling online?", ["Orders came from other cities","She closed her shop","Fabric became cheaper","She went back to the factory"], 0],
+      ["What does Leila say was the most difficult thing?", ["Working long hours","The cost of fabric","Refusing some orders","Finding workers"], 2],
+      ["What is Leila's plan for next year?", ["To hire more workers","To open a shop in the market","To sell only online","To buy a factory"], 1]
+    ]},
+  { first: 11,
+    instruction: "Read the text and choose the best answer.",
+    passage: [
+      "For most of human history, information was scarce and attention was plentiful. Today the situation has been reversed. A single smartphone offers more news, entertainment and conversation than a person could consume in a lifetime, and the companies that build our favourite apps compete fiercely for a limited resource: our focus.",
+      "Critics argue that this competition has come at a cost. Apps are deliberately designed to be habit-forming, rewarding users with a steady stream of notifications, likes and endless feeds. Some researchers claim that constant switching between tasks weakens our capacity for deep, sustained thought, although the evidence on long-term effects remains inconclusive.",
+      "Others take a more measured view. They point out that every new medium, from the printed novel to television, was once accused of corrupting the minds of the young. In their view, the problem lies not in the technology itself but in how deliberately we use it. Simple habits, such as switching off non-essential notifications, keeping phones out of the bedroom and setting aside time for uninterrupted work, can restore a surprising degree of control.",
+      "What is clear is that attention has become a commodity, bought and sold like any other. Whether individuals can reclaim it, or whether regulation will be needed to protect it, is likely to be one of the defining questions of the coming decade."
+    ],
+    items: [
+      ["What does the writer mean by “the situation has been reversed”?", ["Information is now scarce and attention plentiful","Attention is now scarce and information plentiful","People now read more books","Technology companies have less power"], 1],
+      ["The evidence on the long-term effects of task-switching is ___.", ["conclusive","alarming","not yet clear","positive"], 2],
+      ["Why does the writer mention the printed novel and television?", ["To show that fears about new media are not new","To prove that television is harmful","To recommend reading instead of using phones","To explain how apps are designed"], 0],
+      ["In the last paragraph, “commodity” is closest in meaning to ___.", ["a problem","a product that can be traded","a public service","a habit"], 1],
+      ["What is the writer's overall position?", ["Smartphones should be banned","The dangers of apps are exaggerated","It is a serious issue, but the solution is still uncertain","Regulation is the only answer"], 2]
+    ]}
+];
+
+const PART_C = [
+  { key: "C1", words: "about 50 words",
+    prompt: "Write 5 or 6 sentences about yourself. Include your name, where you live, your family, your job or studies, and what you like doing in your free time." },
+  { key: "C2", words: "100 to 120 words",
+    prompt: "Write an email to a friend. Tell them about something interesting you did recently (a trip, a celebration or an event). Say what happened and how you felt, and invite your friend to do something with you next month." },
+  { key: "C3", words: "180 to 220 words",
+    prompt: "Write a short essay on this topic: “The internet has made people more connected, but also more lonely.” To what extent do you agree? Give your opinion, support it with reasons and examples, and consider the opposite view." }
+];
+
+/* ============================================================
+   APP
+   ============================================================ */
+const LETTERS = ["A","B","C","D"];
+const STEPS = [
+  { kind: "intro" },
+  ...PART_A.map((g, i) => ({ kind: "mcq", g, i })),
+  ...PART_B.map((g, i) => ({ kind: "reading", g, i })),
+  ...PART_C.map((t, i) => ({ kind: "writing", t, i })),
+  { kind: "review" },
+  { kind: "done" }
+];
+const REVIEW = STEPS.length - 2, DONE = STEPS.length - 1;
+const STORE = "english-placement-test-v1";
+const RESULT_MODE = /^#[rm]=/.test(location.hash);     // a results link: #r= for the teacher, #m= for the learner
+const LEARNER = location.hash.startsWith("#m=");
+
+const $ = id => document.getElementById(id);
+const app = $("app"), bar = $("bar"), nav = $("nav"), timerEl = $("timer");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const blanks = s => s.replace(/_{3}/g, '<span class="gap"></span><span class="sr">blank</span>');
+const words = s => (s || "").trim() ? s.trim().split(/\s+/).length : 0;
+
+function fresh() {
+  return { candidate: { name: "", contact: "", language: "", studied: "" }, answers: {}, writing: { C1: "", C2: "", C3: "" },
+           step: 0, startedAt: null, submittedAt: null, timeUp: false, left: 0, pastes: 0, sendStatus: null };
+}
+function load() {
+  try {
+    const qs = new URLSearchParams(location.search);
+    if (qs.has("reset")) { localStorage.removeItem(STORE); history.replaceState(null, "", location.pathname); return null; }
+    const raw = localStorage.getItem(STORE);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+let S = Object.assign(fresh(), load() || {});
+
+/* ---------- scoring ---------- */
+function scoreGroup(g, prefix, ans = S.answers) {
+  return g.items.reduce((s, it, i) => s + (ans[prefix + (g.first + i)] === it[2] ? 1 : 0), 0);
+}
+function results(ans = S.answers) {
+  const sec = PART_A.map(g => scoreGroup(g, "A", ans));
+  const a = sec[0] + sec[1] + sec[2];
+  const b = PART_B.reduce((s, g) => s + scoreGroup(g, "B", ans), 0);
+  let check = "Beginner (below 10/15 in every section)";
+  if (sec[2] >= 10) check = "Advanced";
+  else if (sec[1] >= 10) check = "Intermediate";
+  else if (sec[0] >= 10) check = "Beginner";
+  return { sec, a, b, auto: a + b, check };
+}
+/* ---------- results link: all answers packed into the link itself ---------- */
+const b64u = bytes => { let s = ""; for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+const unb64u = str => { str = str.replace(/-/g, "+").replace(/_/g, "/"); while (str.length % 4) str += "="; const bin = atob(str); return Uint8Array.from(bin, c => c.charCodeAt(0)); };
+async function pack(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  if (window.CompressionStream) {
+    try {
+      const out = await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"))).arrayBuffer();
+      return "z" + b64u(new Uint8Array(out));
+    } catch (e) {}
+  }
+  return "j" + b64u(bytes);
+}
+async function unpack(s) {
+  let bytes = unb64u(s.slice(1));
+  if (s[0] === "z") bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"))).arrayBuffer());
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function record() {
+  const c = S.candidate, enc = (n, p) => Array.from({ length: n }, (_, i) => S.answers[p + (i + 1)] === undefined ? "-" : S.answers[p + (i + 1)]).join("");
+  return { v: 1, n: c.name, c: c.contact, l: c.language, s: c.studied, t0: S.startedAt, t1: S.submittedAt, tu: S.timeUp ? 1 : 0,
+           lf: S.left, ps: S.pastes, a: enc(45, "A"), b: enc(15, "B"), w: [S.writing.C1, S.writing.C2, S.writing.C3] };
+}
+async function makeLink() { return location.href.split("#")[0].split("?")[0] + "#r=" + await pack(record()); }
+function answeredCount() { return Object.keys(S.answers).length; }
+function timeUsed() {
+  const ms = Math.min((S.submittedAt || Date.now()) - S.startedAt, CONFIG.timeLimitMinutes * 60000);
+  const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60;
+  return `${m} min ${s} s`;
+}
+function payload() {
+  const r = results(), c = S.candidate;
+  const p = {
+    "_subject": `Placement test: ${c.name} (${r.auto}/60)`,
+    "01 Name": c.name,
+    "02 View the answers": S.link || "(link not ready)",
+    "03 Grammar and reading score": `${r.auto}/60 (grammar ${r.a}/45, reading ${r.b}/15)`,
+    "04 Grammar check suggests": r.check,
+    "05 Phone or email": c.contact || "-",
+    "06 Submitted": new Date(S.submittedAt).toLocaleString(),
+    "07 Time used": timeUsed() + (S.timeUp ? " (time ran out)" : ""),
+    "08 Left the test page": `${S.left} time(s)`
+  };
+  if (/@/.test(c.contact)) p.email = c.contact.trim();
+  return p;
+}
+function summaryText() {
+  const r = results();
+  return `English Placement Test: ${S.candidate.name}\n` +
+         `Grammar and reading: ${r.auto}/60\n` +
+         `Grammar check suggests: ${r.check}\n\n` +
+         `View the answers:\n${S.link || ""}`;
+}
+
+/* ---------- sending ---------- */
+async function send() {
+  if (!S.link) { S.link = await makeLink(); save(); }
+  if (!/^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(CONFIG.formspreeEndpoint)) {
+    S.sendStatus = "noendpoint"; save(); render(); return;
+  }
+  S.sendStatus = "sending"; save(); render();
+  try {
+    const r = await fetch(CONFIG.formspreeEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload())
+    });
+    S.sendStatus = r.ok ? "sent" : "failed";
+  } catch (e) { S.sendStatus = "failed"; }
+  save(); render();
+}
+function submit(auto) {
+  if (S.submittedAt) return;
+  S.submittedAt = Date.now(); S.timeUp = !!auto; S.step = DONE; S.sendStatus = "sending";
+  save(); render(); window.scrollTo(0, 0); send();
+}
+
+/* ---------- timer ---------- */
+const remaining = () => CONFIG.timeLimitMinutes * 60000 - (Date.now() - S.startedAt);
+function durationText(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  const hs = h ? `${h} hour${h === 1 ? "" : "s"}` : "", ms = m ? `${m} minute${m === 1 ? "" : "s"}` : "";
+  return [hs, ms].filter(Boolean).join(" and ");
+}
+function tick() {
+  if (RESULT_MODE || !S.startedAt || S.submittedAt) return;
+  const ms = remaining();
+  if (ms <= 0) { submit(true); return; }
+  const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
+  const pad = n => String(n).padStart(2, "0");
+  timerEl.textContent = h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  timerEl.classList.toggle("warn", ms <= 5 * 60000);
+  timerEl.setAttribute("aria-label", `${h ? h + " hours " : ""}${m} minutes ${s} seconds left`);
+}
+setInterval(tick, 1000);
+
+/* ---------- views ---------- */
+function barLabel(st) {
+  if (st.kind === "mcq") return `<b>Grammar and vocabulary</b>Part A, section ${st.i + 1} of 3`;
+  if (st.kind === "reading") return `<b>Reading</b>Part B, text ${st.i + 1} of 3`;
+  if (st.kind === "writing") return `<b>Writing</b>Part C, task ${st.i + 1} of 3`;
+  return `<b>Check your answers</b>Before you submit`;
+}
+
+function questions(g, prefix) {
+  const lab = g.tf ? ["T","F"] : LETTERS;
+  return `<ol class="qs">` + g.items.map((it, i) => {
+    const n = g.first + i, key = prefix + n, sel = S.answers[key];
+    const two = g.tf || it[1].every(o => o.length <= 16);
+    return `<li class="q">
+      <p class="qtext" id="t-${key}"><span class="qn">${prefix === "B" ? "B" : ""}${n}</span><span>${blanks(esc(it[0]))}</span></p>
+      <div class="opts${two ? " two" : ""}" role="group" aria-labelledby="t-${key}">
+        ${it[1].map((o, j) => `<button type="button" class="opt" aria-pressed="${sel === j}" data-q="${key}" data-i="${j}"><span class="bub" aria-hidden="true">${lab[j]}</span><span>${esc(o)}</span></button>`).join("")}
+      </div></li>`;
+  }).join("") + `</ol>`;
+}
+
+function viewIntro() {
+  const c = S.candidate;
+  return `<div class="sheet">
+    <p class="by">Prepared by ${esc(CONFIG.teacherName)}</p>
+    <h1>English Placement Test</h1>
+    <p class="lede">This test shows your teacher which English class is right for you. It is not a pass or fail exam.</p>
+    <ol class="parts">
+      <li><span><b>Grammar and vocabulary</b><span class="muted">45 questions</span></span></li>
+      <li><span><b>Reading</b><span class="muted">3 short texts, 15 questions</span></span></li>
+      <li><span><b>Writing</b><span class="muted">3 short tasks</span></span></li>
+    </ol>
+    <p class="muted">You have ${durationText(CONFIG.timeLimitMinutes)} for all three parts. Your speaking test is separate, on a call with your teacher.</p>
+    <form id="startForm" novalidate>
+      <div class="fields">
+        <label class="f">Full name<input type="text" id="fName" autocomplete="name" value="${esc(c.name)}"></label>
+        <label class="f">Phone or email<input type="text" id="fContact" autocomplete="email" value="${esc(c.contact)}"></label>
+        <label class="f">First language<input type="text" id="fLang" value="${esc(c.language)}"></label>
+        <label class="f">How long have you studied English?<input type="text" id="fStudied" placeholder="For example: 2 years" value="${esc(c.studied)}"></label>
+      </div>
+      <h2 style="margin-top:22px">Before you start</h2>
+      <ul class="rules">
+        <li>Don't use a dictionary, a translator or help from another person.</li>
+        <li>If you don't know an answer, leave it blank. Please don't guess.</li>
+        <li>Stay on this page. The test records each time you leave it.</li>
+        <li>If the page closes, open the link again on the same phone. Your answers are saved, but the timer keeps running.</li>
+      </ul>
+      <button class="btn primary wide" type="submit">Start the test</button>
+      <p class="err" id="startErr" hidden>Write your full name to start the test.</p>
+    </form>
+  </div>`;
+}
+
+function viewMcq(st) {
+  const g = st.g;
+  return `<div class="sheet">
+    <h2>Questions ${g.first} to ${g.first + g.items.length - 1}</h2>
+    <p class="inst">Choose the best answer to complete each sentence. Tap an answer again to clear it.</p>
+    ${questions(g, "A")}
+  </div>`;
+}
+
+function viewReading(st) {
+  const g = st.g, last = g.first + g.items.length - 1;
+  return `<div class="sheet reading">
+    <article class="passage"><h2>Text ${st.i + 1}</h2>${g.passage.map(p => `<p>${esc(p)}</p>`).join("")}</article>
+    <div>
+      <h2>Questions B${g.first} to B${last}</h2>
+      <p class="inst">${esc(g.instruction)}</p>
+      ${questions(g, "B")}
+    </div>
+  </div>`;
+}
+
+function viewWriting(st) {
+  const t = st.t, n = words(S.writing[t.key]);
+  return `<div class="sheet">
+    <h2>Writing task ${st.i + 1}</h2>
+    <p class="inst">Write ${t.words}. If a task is too difficult, you can leave it empty and go on.</p>
+    <p class="prompt">${esc(t.prompt)}</p>
+    <label class="sr" for="w">Your answer to writing task ${st.i + 1}</label>
+    <textarea id="w" data-w="${t.key}" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="sentences"></textarea>
+    <div class="wmeta"><span id="wc">${n} ${n === 1 ? "word" : "words"}</span><span class="err" id="pasteNote" hidden>Pasting is turned off. Please type your answer.</span></div>
+  </div>`;
+}
+
+function viewReview() {
+  const rows = [];
+  PART_A.forEach((g, i) => rows.push({ go: 1 + i, name: `Grammar, questions ${g.first} to ${g.first + 14}`, g, prefix: "A" }));
+  PART_B.forEach((g, i) => rows.push({ go: 4 + i, name: `Reading text ${i + 1}, questions B${g.first} to B${g.first + 4}`, g, prefix: "B" }));
+  const mcqRows = rows.map(r => {
+    const keys = r.g.items.map((_, i) => r.prefix + (r.g.first + i));
+    const done = keys.filter(k => S.answers[k] !== undefined).length;
+    return `<li><button type="button" data-go="${r.go}">
+      <span class="rv-head"><span class="rv-name">${r.name}</span><span class="rv-count">${done} of ${keys.length} answered</span></span>
+      <span class="bubs">${keys.map(k => `<span class="rb${S.answers[k] !== undefined ? " on" : ""}">${k.replace(/^[AB]/, "")}</span>`).join("")}</span>
+    </button></li>`;
+  }).join("");
+  const wRows = PART_C.map((t, i) => {
+    const n = words(S.writing[t.key]);
+    return `<li><button type="button" data-go="${7 + i}"><span class="rv-head"><span class="rv-name">Writing task ${i + 1}</span><span class="rv-count">${n ? n + " words" : "not started"}</span></span></button></li>`;
+  }).join("");
+  const total = PART_A.length * 15 + PART_B.length * 5;
+  return `<div class="sheet">
+    <h1>Check your answers</h1>
+    <p>You answered ${answeredCount()} of ${total} questions. Tap a section to go back to it.</p>
+    <ul class="rv">${mcqRows}${wRows}</ul>
+    <div id="confirmBox" class="confirm" hidden>
+      <p><b>Submit your test now?</b> After you submit, you can't change your answers.</p>
+      <div class="row"><button class="btn primary" type="button" id="confirmSubmit">Submit the test</button><button class="btn" type="button" id="cancelSubmit">Keep working</button></div>
+    </div>
+    <div class="row" id="submitRow" style="margin-top:22px"><button class="btn primary wide" type="button" id="submitBtn">Submit the test</button></div>
+  </div>`;
+}
+
+function viewDone() {
+  const first = esc((S.candidate.name || "").trim().split(/\s+/)[0] || "");
+  const st = S.sendStatus;
+  let status, actions = "";
+  const backup = `<div class="row">
+      <button class="btn primary" type="button" id="waBtn">Send on WhatsApp</button>
+      <button class="btn" type="button" id="copyBtn">Copy my answers</button>
+    </div>`;
+  const waTeacher = `<div class="row"><button class="btn primary" type="button" id="waBtn">Send to my teacher on WhatsApp</button></div>`;
+  if (st === "sent") {
+    status = `<p class="status">Your answers have been sent. Your teacher will contact you about your level and your speaking test.</p>`;
+    actions = waTeacher;
+  } else if (st === "sending") {
+    status = `<p class="status">Sending your answers to your teacher…</p>`;
+    if (S.link) actions = waTeacher;
+  } else if (st === "noendpoint") {
+    status = `<p class="status bad">This test isn't connected to your teacher's email yet, so your answers were not sent.</p><p>Send them on WhatsApp instead.</p>`;
+    actions = backup;
+  } else {
+    status = `<p class="status bad">Your answers were not sent.</p><p>Check your internet connection and tap Try again. If it still doesn't work, send them on WhatsApp.</p>`;
+    actions = `<div class="row"><button class="btn primary" type="button" id="retryBtn">Try again</button></div>` + backup;
+  }
+  const mine = CONFIG.showAnswersToLearner && S.link
+    ? `<div class="row"><a class="btn${actions ? "" : " primary"}" href="${esc(S.link.replace("#r=", "#m="))}">See my answers</a></div>` : "";
+  return `<div class="sheet">
+    <div class="tick" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h1>Test submitted</h1>
+    <p>Thank you${first ? ", " + first : ""}.${S.timeUp ? " Your time finished, so your answers were submitted automatically." : ""}</p>
+    ${status}${actions}${mine}
+  </div>`;
+}
+
+function avatarHTML() {
+  const src = CONFIG.teacherPhoto || window.TEACHER_PHOTO;
+  if (src) return `<img class="avatar" src="${esc(src)}" alt="${esc(CONFIG.teacherName)}">`;
+  const ini = CONFIG.teacherName.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+  return `<span class="avatar" aria-hidden="true">${esc(ini)}</span>`;
+}
+const watchHTML = () => `<div class="watch">${avatarHTML()}<p class="bubble">${esc(CONFIG.watchMessage)}</p></div>`;
+function showPeek() {
+  if (document.querySelector(".peek")) return;
+  const d = document.createElement("div");
+  d.className = "peek";
+  d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-labelledby", "peekTitle");
+  d.innerHTML = `<div class="peek-card">${avatarHTML()}<h2 id="peekTitle">I see you 👀</h2>
+    <p>You left the test page. Please stay here until you finish, and do your best.</p>
+    <button class="btn primary wide" type="button">OK, I'll stay</button></div>`;
+  d.querySelector("button").addEventListener("click", () => d.remove());
+  document.body.appendChild(d);
+  d.querySelector("button").focus();
+}
+
+function render() {
+  const st = STEPS[S.step];
+  const inTest = !!S.startedAt && !S.submittedAt;
+  bar.hidden = !inTest;
+  nav.hidden = !(inTest && ["mcq", "reading", "writing"].includes(st.kind));
+  app.className = st.kind === "reading" ? "wide" : "";
+
+  app.innerHTML = (inTest && st.kind !== "intro" ? watchHTML() : "") + (
+    st.kind === "intro" ? viewIntro() :
+    st.kind === "mcq" ? viewMcq(st) :
+    st.kind === "reading" ? viewReading(st) :
+    st.kind === "writing" ? viewWriting(st) :
+    st.kind === "review" ? viewReview() : viewDone());
+
+  if (inTest) {
+    $("barTitle").innerHTML = barLabel(st);
+    $("segs").innerHTML = Array.from({ length: 9 }, (_, i) =>
+      `<i class="${i + 1 < S.step ? "done" : i + 1 === S.step ? "now" : ""}"></i>`).join("");
+    tick();
+  }
+  if (!nav.hidden) {
+    $("backBtn").disabled = S.step <= 1;
+    const next = STEPS[S.step + 1];
+    $("nextBtn").textContent =
+      next.kind === "review" ? "Check answers" :
+      next.kind === "reading" && st.kind === "mcq" ? "Next: Reading" :
+      next.kind === "writing" && st.kind === "reading" ? "Next: Writing" : "Next";
+  }
+  if (st.kind === "writing") $("w").value = S.writing[st.t.key] || "";
+}
+
+function go(step) { S.step = step; save(); render(); window.scrollTo(0, 0); }
+
+/* ---------- events ---------- */
+app.addEventListener("submit", e => {
+  if (e.target.id !== "startForm") return;
+  e.preventDefault();
+  const name = $("fName").value.trim();
+  S.candidate = { name, contact: $("fContact").value.trim(), language: $("fLang").value.trim(), studied: $("fStudied").value.trim() };
+  if (!name) { $("startErr").hidden = false; $("fName").focus(); save(); return; }
+  S.startedAt = Date.now();
+  go(1);
+});
+
+app.addEventListener("click", e => {
+  const opt = e.target.closest(".opt");
+  if (opt) {
+    const q = opt.dataset.q, i = +opt.dataset.i;
+    if (S.answers[q] === i) delete S.answers[q]; else S.answers[q] = i;
+    save();
+    opt.parentElement.querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", String(S.answers[q] === +b.dataset.i)));
+    return;
+  }
+  const jump = e.target.closest("[data-go]");
+  if (jump) { go(+jump.dataset.go); return; }
+  const id = e.target.closest("button") && e.target.closest("button").id;
+  if (id === "submitBtn") { $("confirmBox").hidden = false; $("submitRow").hidden = true; $("confirmSubmit").focus(); }
+  if (id === "cancelSubmit") { $("confirmBox").hidden = true; $("submitRow").hidden = false; }
+  if (id === "confirmSubmit") submit(false);
+  if (id === "retryBtn") send();
+  if (id === "waBtn") {
+    const num = (CONFIG.teacherWhatsApp || "").replace(/\D/g, "");
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(summaryText())}`, "_blank");
+  }
+  if (id === "copyBtn") copy(summaryText(), e.target.closest("button"));
+});
+
+app.addEventListener("input", e => {
+  const k = e.target.dataset && e.target.dataset.w;
+  if (!k) return;
+  S.writing[k] = e.target.value; save();
+  const n = words(e.target.value);
+  $("wc").textContent = `${n} ${n === 1 ? "word" : "words"}`;
+});
+["paste", "drop"].forEach(type => app.addEventListener(type, e => {
+  if (!(e.target.dataset && e.target.dataset.w)) return;
+  S.pastes++; save();
+  if (CONFIG.allowPaste) return;
+  e.preventDefault(); $("pasteNote").hidden = false;
+}, true));
+
+$("backBtn").addEventListener("click", () => { if (S.step > 1) go(S.step - 1); });
+$("nextBtn").addEventListener("click", () => go(S.step + 1));
+
+let wasAway = false;
+document.addEventListener("visibilitychange", () => {
+  if (RESULT_MODE || !S.startedAt || S.submittedAt) return;
+  if (document.hidden) { S.left++; save(); wasAway = true; }
+  else if (wasAway) { wasAway = false; showPeek(); }
+});
+window.addEventListener("beforeunload", e => {
+  if (!RESULT_MODE && S.startedAt && !S.submittedAt) { e.preventDefault(); e.returnValue = ""; }
+});
+window.addEventListener("hashchange", () => location.reload());
+
+async function copy(text, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    try {
+      const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+    } catch (e2) {}
+  }
+  btn.textContent = ok ? "Copied" : "Copy didn't work";
+}
+
+/* ============================================================
+   RESPONSE PAGE (teacher): opens when the link ends with #r=...
+   ============================================================ */
+let R = null, RA = {}, M = null;
+const BANDS = [
+  [0, 15, "Beginner (starter)", "A1"], [16, 30, "Beginner (elementary)", "A2"],
+  [31, 45, "Intermediate (lower)", "B1"], [46, 60, "Intermediate (upper)", "B2"],
+  [61, 75, "Advanced", "C1"], [76, 90, "Advanced (proficient)", "C2"]
+];
+const WRITING_RUBRIC = [
+  [5, "All parts answered at the right length; wide range, very few errors; clear paragraphs and linking."],
+  [4, "All parts answered; good range; errors don't affect meaning; well organised."],
+  [3, "Most parts answered; adequate range; some errors but meaning mostly clear."],
+  [2, "Parts missing or too short; limited range; frequent errors that sometimes block meaning."],
+  [1, "Very little relevant writing; mostly single words or memorised phrases."],
+  [0, "No answer, or not in English."]
+];
+const SPEAKING = [
+  ["Fluency", "1–2: long pauses, single words. 3: speaks in sentences with some hesitation. 4–5: speaks at length with natural flow."],
+  ["Grammar and vocabulary", "1–2: very basic, frequent errors. 3: adequate range, meaning clear. 4–5: wide range, mostly accurate, complex ideas."],
+  ["Pronunciation and interaction", "1–2: often hard to understand. 3: generally clear, answers directly. 4–5: clear and natural, develops answers."]
+];
+const total0 = arr => arr.every(x => x !== null) ? arr.reduce((a, b) => a + b, 0) : null;
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+
+function placement(total, speaking) {
+  let i = BANDS.findIndex(b => total >= b[0] && total <= b[1]), note = "";
+  for (const edge of [15, 30, 45, 60, 75]) {
+    if (total >= edge - 2 && total <= edge + 3) {
+      const lower = BANDS.findIndex(b => b[1] === edge);
+      i = speaking >= 10 ? lower + 1 : lower;
+      note = `Borderline total, so the speaking score (${speaking}/15) decided the level.`;
+    }
+  }
+  return { band: BANDS[i], note };
+}
+const marksKey = () => `english-placement-marks-${R.t1}-${R.n}`;
+function loadMarks() {
+  let m = null;
+  try { m = JSON.parse(localStorage.getItem(marksKey())); } catch (e) {}
+  return m || { c: R.w.map(t => words(t) ? null : 0), d: [null, null, null] };
+}
+function saveMarks() { try { localStorage.setItem(marksKey(), JSON.stringify(M)); } catch (e) {} }
+
+function learnerSummaryHTML() {
+  const r = results(RA);
+  const rows = [
+    ["Grammar, questions 1 to 15", r.sec[0]], ["Grammar, questions 16 to 30", r.sec[1]],
+    ["Grammar, questions 31 to 45", r.sec[2]], ["Reading", r.b]
+  ].map(([n, v]) => `<tr><td>${n}<div class="meter"><i style="width:${Math.round(v / 15 * 100)}%"></i></div></td><td>${v}/15</td></tr>`).join("");
+  return `<div class="score-big"><b>${r.auto}</b><span>/ 60</span></div>
+    <p class="muted">Grammar and reading</p>
+    <table class="brk">${rows}</table>
+    <div class="level"><span>What happens next</span><p>Your teacher will mark your writing and do a short speaking test with you. Then you'll get your level.</p></div>`;
+}
+function summaryHTML() {
+  if (LEARNER) return learnerSummaryHTML();
+  const r = results(RA), cT = total0(M.c), dT = total0(M.d);
+  const total = cT !== null && dT !== null ? r.auto + cT + dT : null;
+  const rows = [
+    ["Grammar, questions 1 to 15", r.sec[0]], ["Grammar, questions 16 to 30", r.sec[1]],
+    ["Grammar, questions 31 to 45", r.sec[2]], ["Reading", r.b],
+    ["Writing (you mark it)", cT], ["Speaking (you mark it)", dT]
+  ].map(([n, v]) => `<tr><td>${n}<div class="meter"><i style="width:${v === null ? 0 : Math.round(v / 15 * 100)}%"></i></div></td><td>${v === null ? "&ndash;" : v}/15</td></tr>`).join("");
+  let level;
+  if (total !== null) {
+    const p = placement(total, dT);
+    level = `<div class="level"><span>Level</span><b>${p.band[2]}</b><span class="cefr">CEFR ${p.band[3]}</span>${p.note ? `<p class="muted small">${p.note}</p>` : ""}</div>`;
+  } else {
+    level = `<div class="level"><span>Grammar check suggests</span><b>${r.check}</b><p class="muted small">Mark the writing and speaking further down to get the final level out of 90.</p></div>`;
+  }
+  return `<div class="score-big"><b>${total !== null ? total : r.auto}</b><span>/ ${total !== null ? 90 : 60}</span></div>
+    <p class="muted">${total !== null ? "Total score" : "Grammar and reading, marked automatically"}</p>
+    <table class="brk">${rows}<tr class="tot"><td>Total</td><td>${total === null ? "&ndash;" : total}/90</td></tr></table>${level}`;
+}
+
+function resultCard(it, key, label, tf) {
+  const given = RA[key], state = given === undefined ? "blank" : given === it[2] ? "ok" : "bad";
+  const name = j => (tf ? "" : LETTERS[j] + ". ") + esc(it[1][j]);
+  const opts = it[1].map((o, j) => {
+    const pick = given === j;
+    return `<div class="ro${pick ? " pick " + state : ""}"><span class="rad"></span><span>${name(j)}</span>${pick ? `<span class="mk">${state === "ok" ? "&#10003;" : "&#10007;"}</span>` : ""}</div>`;
+  }).join("");
+  return `<div class="card rq ${state}" data-state="${state}">
+    <div class="rq-top"><p class="rq-q"><span class="qn">${label}</span><span>${blanks(esc(it[0]))}</span></p><span class="pts">${state === "ok" ? 1 : 0}/1 point</span></div>
+    ${state === "blank" ? `<p class="noans">No answer</p>` : ""}${opts}
+    ${state === "ok" ? "" : `<div class="correct"><span>Correct answer</span><b>${name(it[2])}</b></div>`}
+  </div>`;
+}
+const markSelect = (m, i) => `<select data-m="${m}" data-i="${i}" aria-label="Score out of 5"><option value="">&ndash;</option>${[0, 1, 2, 3, 4, 5].map(v => `<option value="${v}"${M[m][i] === v ? " selected" : ""}>${v}</option>`).join("")}</select>`;
+const secHead = (title, score) => `<div class="sec-h"><h2>${title}</h2><span>${score}</span></div>`;
+
+function renderResults() {
+  const states = { ok: 0, bad: 0, blank: 0 };
+  const count = (it, key) => { const g = RA[key]; states[g === undefined ? "blank" : g === it[2] ? "ok" : "bad"]++; };
+  PART_A.forEach(g => g.items.forEach((it, j) => count(it, "A" + (g.first + j))));
+  PART_B.forEach(g => g.items.forEach((it, j) => count(it, "B" + (g.first + j))));
+  const used = Math.min(R.t1 - R.t0, CONFIG.timeLimitMinutes * 60000);
+  const meta = [
+    ["Phone or email", R.c], ["First language", R.l], ["Studied English for", R.s],
+    ["Submitted", new Date(R.t1).toLocaleString()],
+    ["Time used", `${Math.floor(used / 60000)} min${R.tu ? " (time ran out)" : ""}`],
+    ["Left the test page", plural(R.lf, "time"), R.lf > 0],
+    [CONFIG.allowPaste ? "Pasted text into writing" : "Tried to paste text", plural(R.ps, "time"), !CONFIG.allowPaste && R.ps > 0]
+  ].filter(([k]) => !LEARNER || k === "Submitted" || k === "Time used").map(([k, v, flag]) => `<div><span>${k}</span><b class="${flag ? "flag" : ""}">${v ? esc(v) : "&ndash;"}</b></div>`).join("");
+
+  let h = `<div class="card head">
+      <p class="muted small">English Placement Test, ${LEARNER ? "your answers" : "response"}</p>
+      <h1 class="r-title">${esc(R.n)}</h1>
+      <div class="meta">${meta}</div>
+      <div class="row noprint"><button class="btn" type="button" id="printBtn">Print or save as PDF</button></div>
+    </div>
+    <div class="card" id="sumCard">${summaryHTML()}</div>
+    <div class="filter noprint" role="group" aria-label="Show questions">
+      <button class="chip" type="button" data-f="all" aria-pressed="true">All (60)</button>
+      <button class="chip" type="button" data-f="ok" aria-pressed="false">Correct (${states.ok})</button>
+      <button class="chip" type="button" data-f="bad" aria-pressed="false">Wrong (${states.bad})</button>
+      <button class="chip" type="button" data-f="blank" aria-pressed="false">No answer (${states.blank})</button>
+    </div>`;
+
+  PART_A.forEach(g => {
+    h += secHead(`Grammar and vocabulary, questions ${g.first} to ${g.first + 14}`, `${scoreGroup(g, "A", RA)}/15`);
+    g.items.forEach((it, j) => h += resultCard(it, "A" + (g.first + j), g.first + j, false));
+  });
+  PART_B.forEach((g, i) => {
+    h += secHead(`Reading, text ${i + 1}`, `${scoreGroup(g, "B", RA)}/5`);
+    h += `<div class="card"><details><summary>Show the text</summary><div class="passage-r">${g.passage.map(p => `<p>${esc(p)}</p>`).join("")}</div></details></div>`;
+    g.items.forEach((it, j) => h += resultCard(it, "B" + (g.first + j), "B" + (g.first + j), g.tf));
+  });
+
+  h += LEARNER ? secHead("Writing", "Marked by your teacher") : secHead("Writing", `<span id="cTot">${total0(M.c) ?? "&ndash;"}</span>/15`);
+  if (!LEARNER) h += `<div class="card"><details><summary>Writing rubric</summary><table class="brk rub">${WRITING_RUBRIC.map(([s, d]) => `<tr><td><b>${s}</b></td><td>${d}</td></tr>`).join("")}</table></details></div>`;
+  PART_C.forEach((t, i) => {
+    const txt = R.w[i] || "";
+    h += `<div class="card">
+      <p class="rq-q wprompt"><span class="qn">${i + 1}</span><span>${esc(t.prompt)}</span></p>
+      ${txt.trim() ? `<div class="wbox">${esc(txt.trim())}</div>` : `<p class="noans">No answer</p>`}
+      <p class="muted small">${plural(words(txt), "word")} (task asked for ${t.words})</p>
+      ${LEARNER ? "" : `<label class="mark">Score ${markSelect("c", i)} out of 5</label>`}
+    </div>`;
+  });
+
+  if (!LEARNER) h += secHead("Speaking (on a call)", `<span id="dTot">${total0(M.d) ?? "&ndash;"}</span>/15`);
+  if (!LEARNER) h += `<div class="card">${SPEAKING.map(([n, d], i) => `<div class="sp"><label class="mark">${n} ${markSelect("d", i)} out of 5</label><p class="muted small">${d}</p></div>`).join("")}</div>`;
+
+  app.innerHTML = h;
+}
+
+async function showResults() {
+  document.body.classList.add("rmode");
+  bar.hidden = true; nav.hidden = true;
+  try { R = await unpack(location.hash.slice(3)); }
+  catch (e) {
+    app.innerHTML = `<div class="card head"><h1 class="r-title">This results link doesn't open</h1><p>Part of the link is missing. Copy the whole link from the email or WhatsApp message and open it again, in Google Chrome if possible.</p></div>`;
+    return;
+  }
+  RA = {};
+  [...R.a].forEach((ch, i) => { if (ch !== "-") RA["A" + (i + 1)] = +ch; });
+  [...R.b].forEach((ch, i) => { if (ch !== "-") RA["B" + (i + 1)] = +ch; });
+  M = loadMarks();
+  document.title = `${R.n}: English test response`;
+  renderResults();
+
+  app.addEventListener("change", e => {
+    const s = e.target.closest("select[data-m]");
+    if (!s) return;
+    M[s.dataset.m][+s.dataset.i] = s.value === "" ? null : +s.value;
+    saveMarks();
+    $("sumCard").innerHTML = summaryHTML();
+    $("cTot").innerHTML = total0(M.c) ?? "&ndash;";
+    $("dTot").innerHTML = total0(M.d) ?? "&ndash;";
+  });
+  app.addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (chip) {
+      const f = chip.dataset.f;
+      app.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c === chip)));
+      app.querySelectorAll(".rq").forEach(c => { c.hidden = f !== "all" && c.dataset.state !== f; });
+    }
+    if (e.target.closest("#printBtn")) window.print();
+  });
+}
+
+/* ---------- start ---------- */
+if (RESULT_MODE) showResults();
+else if (S.startedAt && !S.submittedAt && remaining() <= 0) submit(true);
+else if (S.submittedAt && S.sendStatus === "sending") { S.step = DONE; render(); send(); }
+else render();
+</script>
+</body>
+</html>
